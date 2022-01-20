@@ -1,0 +1,151 @@
+import com.sun.source.tree.WhileLoopTree;
+
+import javax.print.attribute.standard.JobMessageFromOperator;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.util.jar.JarFile;
+import java.util.Date;
+import java.sql.Timestamp;
+
+public class ImageOperation {
+    public static void operate(int key, Timestamp tm, BufferedWriter fw,String str) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.showOpenDialog(null);
+        File file = fileChooser.getSelectedFile();
+        File filePath = fileChooser.getCurrentDirectory();
+        if (file != null) {
+        try {
+
+            FileInputStream fis = new FileInputStream(file);
+            byte[] data = new byte[fis.available()];
+            fis.read(data);
+            int i = 0;
+            for (byte b : data) {
+                //System.out.println(b);
+                data[i] = (byte) (b ^ key);
+                i++;
+            }
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(data);
+            fos.close();
+            fis.close();
+            JOptionPane.showMessageDialog(null, "Done.... File PROCESSING");
+
+            fw.append("\n");
+            fw.append(tm.toString()); fw.append(",");fw.append(filePath.getPath());
+            String key_1=String.valueOf(key);
+            fw.append("\\"); fw.append(file.getName()); fw.append(","); fw.append(key_1); fw.append(","); fw.append(str);
+            fw.flush();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+        else {
+        JOptionPane.showMessageDialog(null, "Select file ....");
+    }
+    }
+    public static void main(String[] args) throws IOException {
+
+        System.out.println("this is testing");
+        Font font=new Font("Roboto",Font.ITALIC,25);
+        Font font_text=new Font("Courier",Font.BOLD,20);
+
+        // read function
+        File filename =  new File ("D:/Demo.txt");
+        FileReader fr = new FileReader("D:/Demo.txt");
+        BufferedReader br = new BufferedReader(fr);
+        long Line_count = br.lines().count();
+
+        br.lines().findFirst();
+        br.skip(10);
+        System.out.println(br.lines().findFirst());
+        //Write Function
+        FileWriter fw = new FileWriter("D:/Demo.txt",true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+        JTextArea text_a = new JTextArea();
+        text_a.setText("Add Encrypting/Decrypting Key (Max 10)..");
+        text_a.setFont(font_text);
+        text_a.setBackground(Color.getHSBColor(255,10,10));
+        text_a.setForeground(Color.blue);
+        JFrame f=new JFrame();
+        f.setTitle("SECURE YOUR FILE");
+        f.setSize(600,400);
+        f.setLocationRelativeTo(null);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //creating button
+
+        JTextArea text_Image=new JTextArea();
+        text_Image.setText("SELECT File from system to Encrypt/Decrypt");
+        text_Image.setFont(font);
+
+        JButton button1=new JButton();
+        button1.setText("Encrypt");
+        button1.setFont(font);
+
+        JButton button2=new JButton();
+        button2.setText("Decrypt");
+        button2.setFont(font);
+
+        JButton button3=new JButton();
+        button3.setText("CLOSE");
+        button3.setFont(font);
+        //creating text field
+
+        JTextField textField=new JPasswordField("**********",10);
+        textField.setFont(font);
+
+        button1.addActionListener(e->{
+            System.out.println("button clicked");
+            String text=textField.getText();
+            System.out.println(text);
+
+            if (!text.equals("") )  {
+            int temp=Integer.parseInt(text);
+            String encrypt = "Encrypt";
+            operate(temp,timestamp,bw,encrypt);
+             textField.setText("");
+
+         }
+         else {
+             JOptionPane.showMessageDialog(null, "Key missing for IMAGE PROCESSING");
+                }
+
+        });
+        //Decryption Process
+                button2.addActionListener(e->{
+                    System.out.println("button clicked");
+                    String text=textField.getText();
+                    System.out.println(text);
+                    if (!text.equals(""))  {
+                        int temp=Integer.parseInt(text);
+                        String Decrypt = "Decrypt";
+                        operate(temp,timestamp,bw,Decrypt);
+                        textField.setText("");
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "Key missing for IMAGE PROCESSING");
+                    }
+
+                }
+        );
+
+        f.setLayout(new FlowLayout());
+        f.add(text_a);
+        f.add(textField);
+        f.add(text_Image);
+        f.add(button1);
+        f.add(button2);
+        f.add(button3);
+        f.setVisible(true);
+        button3.addActionListener(e->{
+            System.out.println("CLOSEING program  clicked");
+            System.exit(0);
+        });
+
+
+  }
